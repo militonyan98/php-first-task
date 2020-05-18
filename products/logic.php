@@ -2,6 +2,7 @@
 session_start();
 
 include_once('db-connect.php');
+include_once('upload.php');
 
 $pName = $description = $price = $quantity = "";
 $pNameErr = $descriptionErr = $priceErr = $qunatityErr = "";
@@ -46,18 +47,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['descriptionErr'] = $descriptionErr;
     $_SESSION['priceErr'] = $priceErr;
     $_SESSION['quantityErr'] = $quantityErr;
+    $_SESSION['imageErr'] = $imageErr;
 
 
-if($valid){
+if($valid && empty($imageErr)){
   if(empty($_POST['product_id'])){
     $dbConnect=mysqli_query($connection, "INSERT INTO product (product_name, `description`, price, quantity) VALUES('$pName', '$description', '$price', '$quantity')");
+    if($dbConnect){
+      $latestInsertedID=mysqli_insert_id($connection);
+      for($i=0; $i<count($imageNames); $i++){
+          $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$imageNames[$i]', '$latestInsertedID')");
+      }
+    }
   }
   else{
     $product_id=$_POST['product_id'];
     $dbConnect=mysqli_query($connection, "UPDATE product SET product_name='$pName', `description`='$description', price='$price', quantity='$quantity' WHERE product_id='$product_id'");
   }
   $errorMsg = $errorMsg."Performing query";
-  if($dbConnect){
+  if($dbConnect && $queryImg){
     $errorMsg = $errorMsg."Query performed";
     header('Location: product-list.php');
   }
@@ -82,7 +90,3 @@ function checkData($data) {
   $data = mysqli_real_escape_string($connection, htmlspecialchars($data));
   return $data;
 }
-
-
-
-

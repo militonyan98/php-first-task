@@ -7,14 +7,18 @@ $query = mysqli_query($connection, "SELECT * FROM product");
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <title>Products</title>
         <script>
-            function deleteProduct(btn, id){
+            function deleteProduct(id){
                 $.ajax( "delete-product.php?id="+id )
-                    .done(function() {
-                        $('#row'+id).remove();
+                    .success(function(response) {
+                        if(!response.error){
+                            $('#row'+id).remove();
+                        }
+                        else{
+                            alert(response.msg);
+                        }
                     })
                 .fail(function() {
-                })
-                .always(function() {
+                    alert("Something went wrong.")
                 });
             }
         </script>
@@ -46,7 +50,7 @@ $query = mysqli_query($connection, "SELECT * FROM product");
                 <td><?= $row ['price']; ?>	</td>	   				   				  
                 <td> <?= $row ['quantity']; ?></td>
                 <td><a href="edit-page.php?id=<?= $row['product_id']?>" class="btn btn-secondary">Edit</a></td>
-                <td><button id="deleteBtn" onclick="deleteProduct(this,<?= $row ['product_id']; ?>)" class="btn btn-danger">Delete</button> </td>
+                <td><button id="deleteBtn" onclick="deleteProduct(<?= $row ['product_id']; ?>)" class="btn btn-danger">Delete</button> </td>
         </tr>
         <?php
     }
