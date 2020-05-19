@@ -8,8 +8,8 @@ $query = mysqli_query($connection, "SELECT * FROM product");
         <title>Products</title>
         <script>
             function deleteProduct(id){
-                $.ajax( "delete-product.php?id="+id )
-                    .success(function(response) {
+                $.ajax("delete-product.php?id="+id)
+                    .done(function(response){
                         if(!response.error){
                             $('#row'+id).remove();
                         }

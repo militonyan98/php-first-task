@@ -2,12 +2,15 @@
 session_start();
 
 include_once('db-connect.php');
-include_once('upload.php');
+//include_once('upload.php');
 
 $pName = $description = $price = $quantity = "";
-$pNameErr = $descriptionErr = $priceErr = $qunatityErr = "";
-
+$pNameErr = $descriptionErr = $priceErr = $qunatityErr = $imgErr = "";
 $errorMsg = "";
+$target_dir = "images/";
+$countFiles = count($_FILES["fileToUpload"]["name"]);
+$imageNames = [];
+$imageErr = "";
 $valid = true;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST["pName"])) {
@@ -51,28 +54,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 if($valid && empty($imageErr)){
+  $target_id = "";
   if(empty($_POST['product_id'])){
     $dbConnect=mysqli_query($connection, "INSERT INTO product (product_name, `description`, price, quantity) VALUES('$pName', '$description', '$price', '$quantity')");
     if($dbConnect){
-      $latestInsertedID=mysqli_insert_id($connection);
-      for($i=0; $i<count($imageNames); $i++){
-          $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$imageNames[$i]', '$latestInsertedID')");
-      }
+      $target_id=mysqli_insert_id($connection);
+
     }
   }
   else{
     $product_id=$_POST['product_id'];
     $dbConnect=mysqli_query($connection, "UPDATE product SET product_name='$pName', `description`='$description', price='$price', quantity='$quantity' WHERE product_id='$product_id'");
+    if($dbConnect){
+      $target_id=$product_id;
+    }
   }
   $errorMsg = $errorMsg."Performing query";
-  if($dbConnect && $queryImg){
+  if($dbConnect){
     $errorMsg = $errorMsg."Query performed";
     header('Location: product-list.php');
   }
   else {
     $errorMsg = $errorMsg."query error performed"."\r\n".mysqli_error($connection);
     header('Location: error-page.php');
-  };
+  }
+  for($i=0; $i<$countFiles; $i++){
+    $target_file = $target_dir.basename($_FILES["fileToUpload"]["name"][$i]);
+    $isUploaded = 1;
+    $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+    $target_file = $target_dir.basename((microtime(true)*10000).".".$imageFileType);
+    if(isset($_POST["fileToUpload"])){
+        $check = getimagesize($_FILES["fileToUpload"]["tmp_name"][$i]);
+        if($check === false){
+        $imageErr=$imageErr."File is not an image.";
+        $isUploaded = 0;
+        }
+        else{
+            $imageErr=$imageErr."File is an image.";
+        }
+    }
+
+    if (file_exists($target_file)){
+        $imageErr=$imageErr."Sorry, file already exists.";
+        $isUploaded = 0;
+    }
+
+    if ($_FILES["fileToUpload"]["size"][$i] > 200000){
+        $imageErr=$imageErr."Sorry, your file is too large.";
+        $isUploaded = 0;
+    }
+
+    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"&& $imageFileType != "gif" ) {
+        $imageErr=$imageErr."Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+        $isUploaded = 0;
+    }
+
+    if ($isUploaded == 0){
+        $imageErr=$imageErr."Sorry, your file was not uploaded.";
+    }
+    else{
+        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"][$i], $target_file)) {
+            array_push($imageNames, $target_file);
+            echo "The file ".basename( $_FILES["fileToUpload"]["name"][$i])." has been uploaded.";
+        }
+        else {
+            $imageErr=$imageErr."Sorry, there was an error uploading your file.";
+        }
+    }
+    $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$imageNames[$i]', '$target_id')");
+}
+  if($queryImg){
+    $errorMsg = $errorMsg."Query performed";
+    header('Location: product-list.php');
+  }
+  else {
+    $errorMsg = $errorMsg."query error performed"."\r\n".mysqli_error($connection).$target_id;
+    header('Location: error-page.php');
+  }
 }
 else if(empty($_POST['product_id'])){
   header('Location: index.php');
