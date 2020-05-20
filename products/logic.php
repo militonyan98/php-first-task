@@ -5,7 +5,7 @@ include_once('db-connect.php');
 //include_once('upload.php');
 
 $pName = $description = $price = $quantity = "";
-$pNameErr = $descriptionErr = $priceErr = $qunatityErr = $imgErr = "";
+$pNameErr = $descriptionErr = $priceErr = $quantityErr = $imgErr = "";
 $errorMsg = "";
 $target_dir = "images/";
 $countFiles = count($_FILES["fileToUpload"]["name"]);
@@ -50,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['descriptionErr'] = $descriptionErr;
     $_SESSION['priceErr'] = $priceErr;
     $_SESSION['quantityErr'] = $quantityErr;
-    $_SESSION['imageErr'] = $imageErr;
 
 
-if($valid && empty($imageErr)){
+
+if($valid){
   $target_id = "";
   if(empty($_POST['product_id'])){
     $dbConnect=mysqli_query($connection, "INSERT INTO product (product_name, `description`, price, quantity) VALUES('$pName', '$description', '$price', '$quantity')");
@@ -78,12 +78,21 @@ if($valid && empty($imageErr)){
     $errorMsg = $errorMsg."query error performed"."\r\n".mysqli_error($connection);
     header('Location: error-page.php');
   }
+  $errorMsg .= "count".$countFiles;
+
+  $uploadedFile = 0;
+
   for($i=0; $i<$countFiles; $i++){
+    echo ("in for loop");
+    if(!is_uploaded_file($_FILES["fileToUpload"]["tmp_name"][$i])){
+      continue;
+    }
     $target_file = $target_dir.basename($_FILES["fileToUpload"]["name"][$i]);
     $isUploaded = 1;
     $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
     $target_file = $target_dir.basename((microtime(true)*10000).".".$imageFileType);
     if(isset($_POST["fileToUpload"])){
+        echo("fileUpload is set");
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"][$i]);
         if($check === false){
         $imageErr=$imageErr."File is not an image.";
@@ -114,18 +123,28 @@ if($valid && empty($imageErr)){
     }
     else{
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"][$i], $target_file)) {
-            array_push($imageNames, $target_file);
+          $uploadedFile ++;
+          $errorMsg .= "uploaded file".$target_file;
+          $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$target_file', '$target_id')");
             echo "The file ".basename( $_FILES["fileToUpload"]["name"][$i])." has been uploaded.";
         }
         else {
             $imageErr=$imageErr."Sorry, there was an error uploading your file.";
         }
     }
-    $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$imageNames[$i]', '$target_id')");
+    
 }
-  if($queryImg){
+  if(($queryImg || $uploadedFile==0) && empty($imageErr)){
     $errorMsg = $errorMsg."Query performed";
     header('Location: product-list.php');
+  }
+  else if(!empty($imageErr)){
+    if(empty($_POST['product_id'])){
+      header('Location: index.php');
+    }
+    else {
+      header('Location: edit-page.php?id='.$target_id);
+    }
   }
   else {
     $errorMsg = $errorMsg."query error performed"."\r\n".mysqli_error($connection).$target_id;
@@ -136,10 +155,11 @@ else if(empty($_POST['product_id'])){
   header('Location: index.php');
 }
 else {
-  header('Location: edit-page.php');
+  header('Location: edit-page.php?id='.$target_id);
 }
 
 $_SESSION['error'] = $errorMsg;
+$_SESSION['imageErr'] = $imageErr;
 
 }
 

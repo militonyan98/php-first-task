@@ -50,6 +50,17 @@
                 });
             }
         </script>
+                <script type="text/javascript">
+            $(document).ready(function(){
+                $('#fileToUpload').on("input",function () {
+                var files = [];
+                for (var i = 0; i < $(this)[0].files.length; i++) {
+                    files.push($(this)[0].files[i].name);
+                }
+                $("#file-names").html(files.join(', <br>'));
+            });
+            })
+        </script>
     </head>
 
 
@@ -57,7 +68,7 @@
         <?php 
         if($dataAvailable){
         ?>
-        <form class="form-group" method="post" action="logic.php">
+        <form class="form-group" method="post" action="logic.php" enctype="multipart/form-data">
             <div class="form-row align-items-center justify-content-center">
                 <div class="col-auto">
                 <h2 class="text-center text-primary">Edit Product Info:</h2><br>
@@ -79,6 +90,7 @@
                         <label class="custom-file-label">Choose file...</label>
                         <span class="error"><?= empty($_SESSION['imageErr'])?"":"*".$_SESSION['imageErr'];?></span>
                     </div>
+                    <span id="file-names"></span>
                     <table>
                     <?php while($image = mysqli_fetch_assoc($selectImage)){
                         ?>
