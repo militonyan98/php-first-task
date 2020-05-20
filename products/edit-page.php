@@ -1,12 +1,11 @@
 <?php
   session_start();
   
-  var_dump($_SESSION);
+  include_once("db-connect.php");
 
   $dataAvailable = true;
   if(!empty($_GET['id'])){
         $id = $_GET['id'];
-        $connection=mysqli_connect('localhost', 'root', '', 'products');
         $dbConnect=mysqli_query($connection, "SELECT * FROM product WHERE product_id='$id'");
         $row = mysqli_fetch_assoc($dbConnect);
         $selectImage=mysqli_query($connection, "SELECT * FROM product_images WHERE product_id='$id'");

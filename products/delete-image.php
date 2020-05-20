@@ -8,7 +8,9 @@ else{
     $id = $_GET["id"];
     $imageName=mysqli_query($connection, "SELECT image_name FROM product_images WHERE image_id=$id");
     $imageName=mysqli_fetch_assoc($imageName)['image_name'];
-    unlink($imageName);
+    if(file_exists($imageName)){
+        unlink($imageName);
+    }
     $deleteImageQuery = mysqli_query($connection, "DELETE FROM product_images WHERE image_id=$id");
     if($deleteImageQuery){
         echo json_encode(["error" => false, "msg" => "Success"]);
