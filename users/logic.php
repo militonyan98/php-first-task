@@ -81,7 +81,7 @@ if($valid){
   $errorMsg = $errorMsg."performing query";
   if($dbConnect){
     $errorMsg = $errorMsg."query performed";
-    header('Location: user-list.php');
+    header('Location: login.php');
   }
   else {
     $errorMsg = $errorMsg."query error performed"."\r\n".mysqli_error($connection);
@@ -101,7 +101,3 @@ function checkData($data) {
   $data = mysqli_real_escape_string($connection, htmlspecialchars($data));
   return $data;
 }
-
-
-
-

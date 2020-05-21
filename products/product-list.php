@@ -1,6 +1,6 @@
 <?php
 include_once('db-connect.php');
-$query = mysqli_query($connection, "SELECT * FROM product");
+$query = mysqli_query($connection, "SELECT p.product_id, p.product_name, p.`description`, p.price, p.quantity, i.image_name FROM product as p LEFT JOIN product_images as i ON (p.product_id=i.product_id)");
 ?>
 <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -33,6 +33,7 @@ $query = mysqli_query($connection, "SELECT * FROM product");
         <tr>
             <th>ID</th>
             <th>Product Name</th>
+            <th></th>
             <th>Description</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -41,11 +42,15 @@ $query = mysqli_query($connection, "SELECT * FROM product");
         
         </tr>
     </thead>
-    <?php while($row = mysqli_fetch_assoc($query)){
+    <?php
+    if(!$query)
+            echo mysqli_error($query);
+     while($row = mysqli_fetch_assoc($query)){
         ?>
             <tr id="row<?= $row ['product_id']; ?>">
                 <td><?= $row ['product_id']; ?></td>
                 <td> <?= $row ['product_name']; ?></td>
+                <td><div style="width: 100px;"><img class="img-thumbnail" src="<?=$row['image_name']?>"></div></td>
                 <td> <?= $row ['description']; ?></td>
                 <td><?= $row ['price']; ?>	</td>	   				   				  
                 <td> <?= $row ['quantity']; ?></td>

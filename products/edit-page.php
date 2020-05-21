@@ -8,7 +8,7 @@
         $id = $_GET['id'];
         $dbConnect=mysqli_query($connection, "SELECT * FROM product WHERE product_id='$id'");
         $row = mysqli_fetch_assoc($dbConnect);
-        $selectImage=mysqli_query($connection, "SELECT * FROM product_images WHERE product_id='$id'");
+        $selectImage=mysqli_query($connection, "SELECT * FROM product_images WHERE product_id='$id' ORDER BY isAvatar desc");
 
         if(empty($row['product_id'])){
             $dataAvailable = false;
@@ -49,16 +49,33 @@
                 });
             }
         </script>
-                <script type="text/javascript">
+        <script type="text/javascript">
             $(document).ready(function(){
                 $('#fileToUpload').on("input",function () {
-                var files = [];
-                for (var i = 0; i < $(this)[0].files.length; i++) {
-                    files.push($(this)[0].files[i].name);
-                }
-                $("#file-names").html(files.join(', <br>'));
-            });
-            })
+                    var files = [];
+                    for (var i = 0; i < $(this)[0].files.length; i++) {
+                        files.push($(this)[0].files[i].name);
+                    }
+                    $("#file-names").html(files.join(', <br>'));
+                    });
+                })
+        </script>
+
+        <script>
+            function setAvatar(image_id, product_id){
+                $.ajax("set-avatar.php?image_id="+image_id+"&product_id="+product_id)
+                    .done(function(response) {
+                        if(!response.error){
+                            alert('success');
+                        }
+                        else{
+                            alert(response.msg);
+                        }
+                    })
+                .fail(function() {
+                    alert("Something went wrong.")
+                });
+            }
         </script>
     </head>
 
@@ -90,11 +107,21 @@
                         <span class="error"><?= empty($_SESSION['imageErr'])?"":"*".$_SESSION['imageErr'];?></span>
                     </div>
                     <span id="file-names"></span>
-                    <table>
+                    <table class="table">
                     <?php while($image = mysqli_fetch_assoc($selectImage)){
                         ?>
                             <tr id="row<?= $image['image_id']; ?>">
-                                <td><div style="height: 200px; width: 200px"><img src="<?= $image['image_name']?>" class="img-thumbnail"><button type="button" id="deleteBtn" onclick="deleteProduct(<?= $image['image_id']; ?>)" class="btn btn-danger">Delete</button> </div></td>
+                                <td>
+                                    <div style="height: 200px; width: 200px">
+                                        <img src="<?= $image['image_name']?>" class="img-thumbnail">
+                                        <?php if($image['isAvatar']==false){ ?>
+                                        <button type="button" id="deleteBtn" onClick="deleteProduct(<?= $image['image_id']; ?>)" class="btn btn-danger">Delete</button>
+                                        <button type="button" class="btn btn-info" onClick="setAvatar(<?= $image['image_id']?>,<?= $image['product_id'];?>)">Set As Avatar</button>
+                                        <?php } else { ?>
+                                            <h5 class="alert alert-info">Current Avatar</h2>
+                                        <?php } ?>
+                                        </div>
+                                </td>
                                 <td></td>
                         </tr>
                         <?php

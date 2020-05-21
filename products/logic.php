@@ -125,7 +125,8 @@ if($valid){
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"][$i], $target_file)) {
           $uploadedFile ++;
           $errorMsg .= "uploaded file".$target_file;
-          $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id) values ('$target_file', '$target_id')");
+          $isAvatar=($uploadedFile==1) && empty($product_id)?1:0;
+          $queryImg=mysqli_query($connection, "INSERT INTO product_images(image_name, product_id, isAvatar) values ('$target_file', '$target_id', $isAvatar)");
             echo "The file ".basename( $_FILES["fileToUpload"]["name"][$i])." has been uploaded.";
         }
         else {
