@@ -1,6 +1,6 @@
 <?php
 include_once('db-connect.php');
-$query = mysqli_query($connection, "SELECT p.product_id, p.product_name, p.`description`, p.price, p.quantity, i.image_name FROM product as p LEFT JOIN product_images as i ON (p.product_id=i.product_id)");
+$query = mysqli_query($connection, "SELECT p.product_id, p.product_name, p.`description`, p.price, p.quantity, i.image_name FROM product as p LEFT JOIN product_images as i ON (p.product_id=i.product_id) GROUP BY p.product_id");
 ?>
 <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">

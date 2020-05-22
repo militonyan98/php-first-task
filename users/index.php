@@ -16,7 +16,7 @@
       <form class="form-group" method="post" action="logic.php">
           <div class="form-row align-items-center justify-content-center">
               <div class="col-auto">
-              <h2 class="text-center text-primary">Enter Your Info:</h2><br>
+              <h2 class="text-center text-primary">Register</h2><br>
                   <input type="text" name="fname" class="form-control" placeholder="First name">
                   <span class="error"><?php echo empty($_SESSION['fnameErr'])?"":"*".$_SESSION['fnameErr'];?></span>
                   <br><br>
@@ -41,7 +41,7 @@
                   <span class="error"><?php echo empty($_SESSION['passwordConfirmErr'])?"":"*".$_SESSION['passwordConfirmErr'];?></span>
                   <br><br>
 
-                  <button type="submit" name="submit" value="Submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" name="submit" value="Submit" class="btn btn-primary">Register</button>
               </div>
           </div>
       </form>

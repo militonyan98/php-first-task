@@ -5,7 +5,6 @@ include_once("db-connect.php");
 
 $fname = $lname = $gender = $email = $emailErr = $password = $passwordConfirm = "";
 $fnameErr = $lnameErr = $genderErr = $passwordErr = $passwordConfirmErr = "";
-
 $errorMsg = "";
 $valid = true;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -41,7 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $emailErr = "Email is required";
   } else {
     $email = checkData($_POST["email"]);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $emailQuery = mysqli_query($connection, "SELECT email FROM user WHERE email='$email'");
+    $emailQuery = mysqli_fetch_assoc($emailQuery);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) && empty($emailQuery['email'])) {
         $emailErr = "Invalid email format";
       }
   }
@@ -49,6 +50,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if(empty($_POST["password"])){
     $valid = false;
       $passwordErr = "Password is required";
+  }
+  else{
+    $password = $_POST["password"];
   }
 
   if(empty($_POST["passwordConfirm"])){
@@ -88,6 +92,7 @@ if($valid){
     header('Location: error-page.php');
   };
 }
+
 else {
   header('Location: index.php');
 }
