@@ -36,7 +36,7 @@ $_SESSION['passwordError'] = $passwordError;
 
 
 if($valid){
-    session_unset();
+    //session_unset();
     $passwordHash = md5($password);
     $getUser = mysqli_query($connection, "SELECT `user_id`, `password` FROM user WHERE email = '$email'");
     echo mysqli_connect_error($connection);
