@@ -2,20 +2,19 @@
 include_once('db-connect.php');
 session_start();
 
+if(empty($_SESSION['id'])){
+    header("Location: login.php");
+}
 if(isset($_SESSION['id'])){
     $id=$_SESSION['id'];
-    $userInfo=mysqli_query($connection, "SELECT u.`user_id`, f_name, l_name, gender, email, image_name FROM user as u LEFT JOIN profile_picture as p on u.`user_id`=p.`user_id` WHERE u.`user_id`=$id");
+    $userInfo=mysqli_query($connection, "SELECT `user_id`, f_name, l_name, gender, email, avatar FROM user WHERE `user_id`=$id");
     if(!$userInfo)
         echo mysqli_error($connection);
     $userInfo=mysqli_fetch_assoc($userInfo);
+
+    
 }
-
-$_SESSION['user_id']=$userInfo['user_id'];
-$_SESSION['first_name']=$userInfo['f_name'];
-$_SESSION['last_name']=$userInfo['l_name'];
-$_SESSION['gender']=$userInfo['gender'];
-$_SESSION['email']=$userInfo['email'];
-
+//$_SESSION['id']=$userInfo['id']; 
 ?>
 
 
@@ -26,7 +25,11 @@ $_SESSION['email']=$userInfo['email'];
         
     </head>
     <body style="margin: 20px; padding: 30px;">  
-        <h3>Personal Information | <?= $userInfo['f_name']." ".$userInfo['l_name']?></h3>        
+        <div class="row">
+        <div class="col-md-10"><h3>Personal Information | <?= $userInfo['f_name']." ".$userInfo['l_name']?></h3></div>
+        <div class="col-md-2"><a href="logout.php" class="btn btn-info">Log Out</a></div>
+        </div>
+        <br></br>
         <table class="table">
             <thead class="thead-light">
                 <tr>
@@ -41,7 +44,7 @@ $_SESSION['email']=$userInfo['email'];
                   
                     <td><?= $userInfo['f_name']; ?></td>
                     <td> <?= $userInfo['l_name']; ?></td>
-                    <td><div style="width: 100px;"><img class="img-thumbnail" src="<?=$userInfo['image_name']?>"></div></td> 
+                    <td><div style="width: 100px;"><img class="img-thumbnail" src="<?=$userInfo['avatar']?>"></div></td> 
                     <td> <?= $userInfo['gender']; ?></td>
                     <td><?= $userInfo['email']; ?></td>
                     
@@ -57,4 +60,4 @@ $_SESSION['email']=$userInfo['email'];
             <button type="submit" name="submit" value="Submit" class="btn btn-primary">Change Avatar</button>
         </form>
     </body>
-</html> 
+</html>

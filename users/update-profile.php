@@ -7,9 +7,6 @@ $imageErr = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
-    // if(is_uploaded_file($_FILES["fileToUpload"]["tmp_name"])){
-
-    // }
     $target_dir = "profile-pictures/";
     $target_file = $target_dir.basename($_FILES["fileToUpload"]["name"]);
     $isUploaded=1;
@@ -45,8 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
           $errorMsg .= "uploaded file".$target_file;
           $target_id = $_SESSION['id'];
-          $queryDelete = mysqli_query($connection, "DELETE FROM profile_picture WHERE `user_id`='$target_id'");
-          $queryImg=mysqli_query($connection, "INSERT INTO profile_picture(image_name, `user_id`) values ('$target_file', '$target_id')");
+          $queryImg=mysqli_query($connection, "UPDATE user SET avatar='$target_file' WHERE `user_id`=$target_id");
           header("Location: profile.php");
             echo "The file ".basename($_FILES["fileToUpload"]["name"])." has been uploaded.";
         }

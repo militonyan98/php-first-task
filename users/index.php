@@ -23,11 +23,11 @@
                   <input type="text" name="lname" class="form-control" placeholder="Last name">
                   <span class="error"><?php echo empty($_SESSION['lnameErr'])?"":"*".$_SESSION['lnameErr'];?></span>
                   <br><br>
-                  <select class="custom-select my-1 mr-sm-2" value="gender" name="gender">
-                      <option value="0" selected>Gender</option>
-                      <option value="Female">Female</option>
-                      <option value="Male">Male</option>
-                      <option value="Other">Other</option>
+                  <select class="custom-select my-1 mr-sm-2" name="gender">
+                      <option value="" selected>Gender</option>
+                      <option value="0">Female</option>
+                      <option value="1">Male</option>
+                      <option value="2">Other</option>
                   </select>
                   <span class="error"><?php echo empty($_SESSION['genderErr'])?"":"*".$_SESSION['genderErr'];?></span>
                   <br><br>
